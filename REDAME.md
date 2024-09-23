@@ -53,7 +53,7 @@ The following exception is raised:
 
 In order to deploy and test proceed as follows:
 
-    $ git clone https://github.com/nicolasduminil/quarkus-test-resource-lifecycle-manager-issue.git
-    $ cd quarkus-test-resource-lifecycle-manager-issue
+    $ git clone https://github.com/nicolasduminil/wildfly-rxjava2-issue.git
+    $ cd wildfly-rxjava2-issue
     $ mvn package
     $ mvn failsafe:integration-test
