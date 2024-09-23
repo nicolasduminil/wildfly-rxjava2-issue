@@ -63,7 +63,7 @@ public class TimeZoneStreamResourceIT
       FlowableRxInvoker invoker = client.target(timeUri).request().rx(FlowableRxInvoker.class);
       assertThat(invoker).isNotNull();
       @SuppressWarnings("unchecked")
-      Flowable<String> flowable = (Flowable<String>) invoker.get(new GenericType<Flowable<String>>() {});
+      Flowable<String> flowable = (Flowable<String>) invoker.get(String.class);
       assertThat(flowable).isNotNull();
       Set<String> tzs = new TreeSet<>(); //FIXME [RESTEASY-2778] Intermittent flow / flux test failure
       flowable.subscribe(
