@@ -1,7 +1,7 @@
 <jboss-deployment-structure>
   <deployment>
     <dependencies>
-      <module name="org.jboss.resteasy.resteasy-rxjava"/>
+      <module name="org.jboss.resteasy.resteasy-rxjava2"/>
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

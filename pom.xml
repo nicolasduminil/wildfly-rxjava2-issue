@@ -7,15 +7,14 @@
   <groupId>fr.simplex-software.workshop</groupId>
   <artifactId>wildfly-rxjava2-issue</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jakarta.jakartaee-api.version>10.0.0</jakarta.jakartaee-api.version>
     <wildfly.version>33.0.0.Final</wildfly.version>
-    <wildfly-jar-maven-plugin.version>11.0.2.Final</wildfly-jar-maven-plugin.version>
-    <wildfly.version>33.0.0.Final</wildfly.version>
-    <wildfly-maven-plugin.version>5.0.0.Final</wildfly-maven-plugin.version>
+    <wildfly-maven-plugin.version>5.0.1.Final</wildfly-maven-plugin.version>
     <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>
     <resteasy.version>6.2.9.Final</resteasy.version>
     <slf4j.version>2.0.10</slf4j.version>
@@ -79,6 +78,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-json-binding-provider</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -89,6 +89,7 @@
       <groupId>io.reactivex.rxjava2</groupId>
       <artifactId>rxjava</artifactId>
       <version>2.2.21</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -151,73 +152,39 @@
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>war</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.wildfly.plugins</groupId>
-        <artifactId>wildfly-jar-maven-plugin</artifactId>
-        <version>${wildfly-jar-maven-plugin.version}</version>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>${wildfly-maven-plugin.version}</version>
         <configuration>
-          <feature-pack-location>wildfly@maven(org.jboss.universe:community-universe)#${wildfly.version}
-          </feature-pack-location>
+          <!-- <bootable-jar>true</bootable-jar> -->
+          <feature-packs>
+            <feature-pack>
+              <location>wildfly@maven(org.jboss.universe:community-universe)#${wildfly.version}</location>
+              <included-packages>
+                <include-package>org.jboss.resteasy.resteasy-rxjava2</include-package>
+              </included-packages>
+            </feature-pack>
+          </feature-packs>
           <layers>
+            <layer>cloud-server</layer>
             <layer>jaxrs</layer>
             <layer>logging</layer>
             <layer>management</layer>
           </layers>
-          <excluded-layers>
-            <layer>deployment-scanner</layer>
-          </excluded-layers>
-          <plugin-options>
+          <name>ROOT.war</name>
+          <group>wildfly-bootable</group>
+          <tag>local</tag>
+          <galleon-options>
             <jboss-fork-embedded>true</jboss-fork-embedded>
-          </plugin-options>
-          <output-file-name>${project.artifactId}.jar</output-file-name>
+          </galleon-options>
+          <!-- <bootable-jar-name>${project.artifactId}.jar</bootable-jar-name> -->
         </configuration>
         <executions>
           <execution>
             <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.google.cloud.tools</groupId>
-        <artifactId>jib-maven-plugin</artifactId>
-        <version>3.4.3</version>
-        <configuration>
-          <containerizingMode>packaged</containerizingMode>
-          <to>
-            <image>wildfly-bootable/${project.artifactId}</image>
-            <tags>
-              <tag>local</tag>
-            </tags>
-          </to>
-          <container>
-            <mainClass>org.wildfly.core.jar.boot.Main</mainClass>
-            <args>
-              <arg>-b=0.0.0.0</arg>
-            </args>
-            <jvmFlags>
-              <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</jvmFlag>
-            </jvmFlags>
-            <ports>
-              <port>8080</port>
-            </ports>
-          </container>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>dockerBuild</goal>
+              <goal>image</goal>
             </goals>
           </execution>
         </executions>
